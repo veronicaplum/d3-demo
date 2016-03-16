@@ -42,4 +42,15 @@ window.onload = function(){
             return d.city.stringify;
         });
 
+
+
+
+
+ var y = d3.scale.linear()
+        .range([440, 95])
+        .domain([
+            minPop,
+            maxPop
+        ]);
+    
     

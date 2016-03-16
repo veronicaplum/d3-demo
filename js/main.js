@@ -1,7 +1,7 @@
 /* 575 boilerplate main.js */
 //execute script when window is loaded
 window.onload = function(){
-    var w =900, h = 500 ; 
+    var w =1000, h = 500 ; 
     
         /*Shandong Provience, China*/
         var cityPop = [
@@ -29,7 +29,7 @@ window.onload = function(){
         .attr("height", h)
         .attr("class", "container") //assings class name, useful that it assigns it to block name
                                     //class names are useful for stylizing
-        .style("background-color", "rgba(20,0,130, 0.8)");
+        .style("background-color", "rgba(20,0,130, 0.3)");
     
     var innerRect = container.append("rect") ///new inside svg
         .datum(400)
@@ -40,7 +40,7 @@ window.onload = function(){
             return d; //400
         })
         .attr("class", "innerRect") //class name
-        .attr("x", 50) //position from left on the x (horizontal) axis
+        .attr("x", 100) //position from left on the x (horizontal) axis
         .attr("y", 50) //position from top on the y (vertical) axis
         .style("fill", "#FFFFFF"); //fill color
     
@@ -65,17 +65,15 @@ window.onload = function(){
     });
 
     //scale for circles center y coordinate
+        //Example 3.3 line 12...scale for circles center y coordinate
     var y = d3.scale.linear()
-        .range([440, 95])
-        .domain([
-            minPop,
-            maxPop
-        ]);
-    
+        .range([450, 50]) //was 440, 95
+        .domain([0, 4500000]); //was minPop, maxPop
+
     
  //above Example 2.8 line 20
     var x = d3.scale.linear() //create the scale
-        .range([90, 810]) //output min and max
+        .range([150, 810]) //output min and max
         .domain([0, 3]); //input min and max
     
         //color scale generator 
@@ -97,9 +95,52 @@ window.onload = function(){
      //create axis g element and add axis
     var axis = container.append("g")
         .attr("class", "axis")
-        .attr("transform", "translate(50, 0)")
+        .attr("transform", "translate(90, 0)")
         .call(yAxis);
-       
+    
+     var title = container.append("text")
+        .attr("class", "title")
+        .attr("text-anchor", "middle")
+        .attr("x", 450)
+        .attr("y", 30)
+        .text("Shandong Province Populations (China)");
+    
+ //Example 3.14 line 1...create circle labels
+    var labels = container.selectAll(".labels")
+        .data(cityPop)
+        .enter()
+        .append("text")
+        .attr("class", "labels")
+        .attr("text-anchor", "left")
+        .attr("y", function(d){
+            //vertical position centered on each circle
+            return y(d.population) + 5;
+        });
+
+    //first line of label
+    var nameLine = labels.append("tspan")
+        .attr("class", "nameLine")
+        .attr("x", function(d,i){
+            //horizontal position to the right of each circle
+            return x(i) + Math.sqrt(d.population * 0.002 / Math.PI) + 5;
+        })
+        .text(function(d){
+            return d.city;
+        });
+
+        //create format generator
+    var format = d3.format(",");
+    
+    //second line of label
+    var popLine = labels.append("tspan")
+        .attr("class", "popLine")
+        .attr("x", function(d,i){
+            return x(i) + Math.sqrt(d.population * 0.002 / Math.PI) + 5;
+        })
+        .attr("dy", "15") //vertical offset
+        .text(function(d){
+            return "Pop. " + format(d.population); //use format generator to format numbers
+        });
     
    var circles = container.selectAll(".circles") //create an empty selection
         .data(cityPop) //here we feed in an array
@@ -111,7 +152,7 @@ window.onload = function(){
         })
         .attr("r", function(d){
             //calculate the radius based on population value as circle area
-            var area = d.population*0.003; // * 0.01;
+            var area = d.population*0.002; // * 0.01;
             return Math.sqrt(area/Math.PI);
         })
       .attr("cx", function(d, i){
